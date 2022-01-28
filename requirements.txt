@@ -1,0 +1,14 @@
+Pillow
+SQLAlchemy
+bs4
+cfscrape
+html5lib
+icecream
+loguru
+lxml
+mergedeep
+natsort
+numpy
+python-ulid
+pyyaml
+requests

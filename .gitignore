@@ -1,0 +1,14 @@
+.vscode
+.vim
+.idea
+
+__pycache__
+
+dist/
+build/
+
+output/
+tmp/
+logs/
+
+.env
