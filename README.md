@@ -48,3 +48,7 @@ PDFに結合する際、pngの透過が消え、RGBに変換される。
 元ファイルが書き変わる(png -> jpeg)ため、バックアップを推奨。
 その際の画質。
 1 ~ 100(int)
+
+## Log
+
+`logs/common/{YYYY-MM}/{DD}.log`
