@@ -41,7 +41,7 @@ logger.add(
 @dataclass
 class ProcPayload:
     parent_ulid: ULID
-    img_dirs: List[str]
+    img_dirs: List
     pdf_dir: str
     quality: int
     is_ulid: bool
@@ -57,27 +57,30 @@ def convert_to_pdf(payload: ProcPayload):
 
     convert_time = time.time()
     for d in payload.img_dirs:
-        convert(Path(d), payload.quality, logger)
+        convert(Path(d), payload.quality)
     convert_elapsed = time.time() - convert_time
     logger.info(f'convert to non alpha took {convert_elapsed:.3f} sec.')
 
     concat_time = time.time()
     for d in payload.img_dirs:
-        images_path = Path(d)
-        images = natsorted([v for v in images_path.glob('*') if re.search('/*\.(jpg|jpeg|png)', str(v))])
-        if len(images) == 0:
-            return
-        li = []
-        for img in images:
-            li.append(Image.open(img).convert('RGB'))
-        base: Image = li[0]
-        rest = li[1:]
+        try:
+            images_path = Path(d)
+            images = natsorted([v for v in images_path.glob('*') if re.search('/*\.(jpg|jpeg|png)', str(v))])
+            if len(images) == 0:
+                return
+            li = []
+            for img in images:
+                li.append(Image.open(str(img)).convert('RGB'))
+            base = li[0]
+            rest = li[1:]
 
-        d_name = Path(d).stem
-        filename = f'{ULID()}.pdf' if payload.is_ulid else f'{d_name}.pdf'
-        pdf_file_path = Path(payload.pdf_dir, str(payload.parent_ulid), filename)
-        base.save(pdf_file_path, save_all=True, append_images=rest)
-        logger.success(f'{pid}:saved: {pdf_file_path}')
+            d_name = Path(d).stem
+            filename = f'{ULID()}.pdf' if payload.is_ulid else f'{d_name}.pdf'
+            pdf_file_path = Path(payload.pdf_dir, str(payload.parent_ulid), filename)
+            base.save(pdf_file_path, save_all=True, append_images=rest)
+            logger.success(f'{pid}:saved: {pdf_file_path}')
+        except Exception as e:
+            logger.error(f'{d} failed: {e}')
     concat_elapsed = time.time() - concat_time
     logger.info(f'concat all images to each pdf took {concat_elapsed:.3f} sec.')
 
@@ -93,7 +96,7 @@ def main(img_dir: str, save_dir: str, ulid: bool, quality: int):
     logger.info(f'image concat start @{home_ulid}.')
 
     prepare(save_dir)
-    prepare(Path(save_dir, str(home_ulid)))
+    prepare(str(Path(save_dir, str(home_ulid))))
 
     worker_count = cpu_count()
     logger.trace(f'worker count: {worker_count}')
