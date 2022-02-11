@@ -80,7 +80,7 @@ def convert_to_pdf(payload: ProcPayload):
             base.save(pdf_file_path, save_all=True, append_images=rest)
             logger.success(f'{pid}:saved: {pdf_file_path}')
         except Exception as e:
-            logger.error(f'{d} failed.')
+            logger.error(f'{d} failed: {e}')
     concat_elapsed = time.time() - concat_time
     logger.info(f'concat all images to each pdf took {concat_elapsed:.3f} sec.')
 
